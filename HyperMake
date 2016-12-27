@@ -1,0 +1,16 @@
+---
+format: hypermake.v0
+
+name: toolchain
+description: the base image containing toolchain for robotalks projects
+
+targets:
+  image:
+    description: toolchain base image
+    build: Dockerfile
+    cache: false
+    image: robotalks/toolchain:latest
+
+settings:
+  default-targets:
+    - image
