@@ -26,19 +26,26 @@ else
     fi
 fi
 
+if [ -z "$CGO_ENABLED" -o "$CGO_ENABLED" == "0" ]; then
+    LDFLAGS="$LDFLAGS -extldflags -static"
+fi
+
 case "$ARCH" in
     amd64)
         export GOARCH=$ARCH
-    ;;
-    arm|armel)
-        export GOARCH=arm
+        export CC=x86_64-linux-gnu-gcc
+        export CXX=x86_64-linux-gnu-g++
     ;;
     armhf)
         export GOARCH=arm
         export GOARM=7
+        export CC=arm-linux-gnueabihf-gcc
+        export CXX=arm-linux-gnueabihf-g++
     ;;
     arm64)
         export GOARCH=arm64
+        export CC=aarch64-linux-gnu-gcc
+        export CXX=aarch64-linux-gnu-g++
     ;;
     *)
         echo Unknown ARCH=$ARCH >&2
@@ -47,7 +54,6 @@ case "$ARCH" in
 esac
 
 mkdir -p $OUT_DIR/bin
-CGO_ENABLED=0 go build -o $OUT_DIR/bin/$OUT_BIN \
-    -a -installsuffix netgo \
-    -ldflags "$LDFLAGS $GO_LDFLAGS -extldflags -static" \
+CGO_ENABLED=${CGO_ENABLED:-0} go build -o $OUT_DIR/bin/$OUT_BIN \
+    -ldflags "$LDFLAGS $GO_LDFLAGS" \
     $@
