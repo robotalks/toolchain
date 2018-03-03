@@ -5,10 +5,11 @@ set -ex
 . $(dirname $(readlink $BASH_SOURCE))/functions.sh
 
 ARCH=$1
-OUT_BIN=$2
+OUT_FN=$2
 test -n "$ARCH"
-test -n "$OUT_BIN"
+test -n "$OUT_FN"
 OUT_DIR=$OUT_BASE/$ARCH
+OUT_BIN=$OUT_DIR/$OUT_FN
 
 shift; shift
 
@@ -53,7 +54,7 @@ case "$ARCH" in
     ;;
 esac
 
-mkdir -p $OUT_DIR/bin
-CGO_ENABLED=${CGO_ENABLED:-0} go build -o $OUT_DIR/bin/$OUT_BIN \
+mkdir -p $(dirname $OUT_BIN)
+CGO_ENABLED=${CGO_ENABLED:-0} go build -o $OUT_BIN \
     -ldflags "$LDFLAGS $GO_LDFLAGS" \
     $@
