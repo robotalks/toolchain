@@ -7,13 +7,14 @@ KIT_HOME=$(dirname $(readlink $BASH_SOURCE))
 
 ARCH="$1"
 PROJECT_DIR="$2"
-CMAKE_BUILD_TYPE="$3"
+
+shift; shift
+
+: ${CMAKE_BUILD_TYPE:=Release}
 
 test -n "$ARCH"
 test -n "$PROJECT_DIR" -a -d "$SRC_ROOT/$PROJECT_DIR"
 test "$CMAKE_BUILD_TYPE" == "Debug" -o "$CMAKE_BUILD_TYPE" == "Release"
-
-shift; shift; shift
 
 BINS="$@"
 
@@ -29,6 +30,10 @@ BLD_DIR=$BLD_BASE/$ARCH/$PROJECT_DIR/$CMAKE_BUILD_TYPE
 test -n "$NO_CLEAN" || rm -fr $BLD_DIR
 mkdir -p $BLD_DIR
 cd $BLD_DIR
+export CPATH=$OUT_DIR/include
+export LIBRARY_PATH=$OUT_DIR/lib
+export CFLAGS="$CFLAGS -I$OUT_DIR/include"
+export LDFLAGS="$LDFLAGS -L$OUT_DIR/lib"
 cmake $CMAKE_OPTS \
     -DARCH=$ARCH \
     -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH:-$SRC_ROOT/cmake} \
